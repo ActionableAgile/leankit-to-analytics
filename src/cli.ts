@@ -35,7 +35,7 @@ const writeFile = (filePath: string, data: any) =>
 
 const run = async function(cliArgs: any): Promise<void> {
 
-  if (cliArgs.leankit) {
+  // if (cliArgs.leankit) {
 
     if (cliArgs.setup) {
       console.log('Welcome to the LeanKit Extraction Tool Setup');
@@ -77,69 +77,69 @@ const run = async function(cliArgs: any): Promise<void> {
     }
     log(`Done. Results written to ${outputPath}`);
     return;
-  }
+  // }
 
 
-  // Parse CLI settings
-  const jiraConfigPath: string = cliArgs.i ? cliArgs.i : defaultYamlPath;
-  const isLegacyYaml: boolean = (cliArgs.l || cliArgs.legacy) ? true : false;
-  const outputPath: string = cliArgs.o ? cliArgs.o : defaultOutputPath;
-  const outputType: string = outputPath.split('.')[1].toUpperCase();
-  if (outputType !== 'CSV' && outputType !== 'JSON') {
-    throw new Error('Only CSV and JSON is currently supported for file output.');
-  }
-
-  // Parse YAML settings
-  let settings: any  = {};
-  try {
-    let yamlConfig = safeLoad(fs.readFileSync(jiraConfigPath, 'utf8'));
-    settings = yamlConfig;
-    settings.legacy = isLegacyYaml;
-  } catch (e) {
-    console.log(`Error parsing settings ${e}`);
-    throw e;
-  }
-  
-  log('Beginning extraction process');
-
-  // Progress bar setup
-  const updateProgressHook = (bar => {
-    bar.tick();
-    return (percentDone: number) => {
-      if (percentDone <= 100) 
-        bar.tick(percentDone);
-    } 
-  })(bar);
-  
-  // Import data
-  const jiraExtractor = new JiraExtractor()
-    .importSettings(settings, 'yaml')
-    .setBatchSize(25)
-
-  try {
-    const workItems = await jiraExtractor.extractAll(updateProgressHook);
-
-    // Export data
-    let data: string;
-    if (outputType === 'CSV') {
-      data = await jiraExtractor.toCSV(workItems);
-    } else if (outputType === 'JSON') {
-      data = jiraExtractor.toSerializedArray(workItems);
-    }
-    try {
-      await writeFile(outputPath, data);
-    } catch (e) {
-      log(`Error writing jira data to ${outputPath}`);
-    }
-
-    const end = new Date().getTime();
-    log(`Done. Results written to ${outputPath}`);
-    
-    return;
-  } catch (e) {
-    log(`Error extracting JIRA Items ${e}`);
-    throw e;
-  }
+  // // Parse CLI settings
+  // const jiraConfigPath: string = cliArgs.i ? cliArgs.i : defaultYamlPath;
+  // const isLegacyYaml: boolean = (cliArgs.l || cliArgs.legacy) ? true : false;
+  // const outputPath: string = cliArgs.o ? cliArgs.o : defaultOutputPath;
+  // const outputType: string = outputPath.split('.')[1].toUpperCase();
+  // if (outputType !== 'CSV' && outputType !== 'JSON') {
+  //   throw new Error('Only CSV and JSON is currently supported for file output.');
+  // }
+  //
+  // // Parse YAML settings
+  // let settings: any  = {};
+  // try {
+  //   let yamlConfig = safeLoad(fs.readFileSync(jiraConfigPath, 'utf8'));
+  //   settings = yamlConfig;
+  //   settings.legacy = isLegacyYaml;
+  // } catch (e) {
+  //   console.log(`Error parsing settings ${e}`);
+  //   throw e;
+  // }
+  //
+  // log('Beginning extraction process');
+  //
+  // // Progress bar setup
+  // const updateProgressHook = (bar => {
+  //   bar.tick();
+  //   return (percentDone: number) => {
+  //     if (percentDone <= 100)
+  //       bar.tick(percentDone);
+  //   }
+  // })(bar);
+  //
+  // // Import data
+  // const jiraExtractor = new JiraExtractor()
+  //   .importSettings(settings, 'yaml')
+  //   .setBatchSize(25)
+  //
+  // try {
+  //   const workItems = await jiraExtractor.extractAll(updateProgressHook);
+  //
+  //   // Export data
+  //   let data: string;
+  //   if (outputType === 'CSV') {
+  //     data = await jiraExtractor.toCSV(workItems);
+  //   } else if (outputType === 'JSON') {
+  //     data = jiraExtractor.toSerializedArray(workItems);
+  //   }
+  //   try {
+  //     await writeFile(outputPath, data);
+  //   } catch (e) {
+  //     log(`Error writing jira data to ${outputPath}`);
+  //   }
+  //
+  //   const end = new Date().getTime();
+  //   log(`Done. Results written to ${outputPath}`);
+  //
+  //   return;
+  // } catch (e) {
+  //   log(`Error extracting JIRA Items ${e}`);
+  //   throw e;
+  // }
 };
 
 (async function(args: any): Promise<void> {
@@ -150,4 +150,3 @@ const run = async function(cliArgs: any): Promise<void> {
     log(e);
   }
 }(getArgs()));
-
